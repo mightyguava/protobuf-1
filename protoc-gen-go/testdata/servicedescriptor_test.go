@@ -2,10 +2,14 @@ package testdata
 
 import (
 	"testing"
-	"google.golang.org/grpc"
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/golang/protobuf/proto"
+	"compress/gzip"
+	"bytes"
+	"io/ioutil"
 )
 
-func TestServiceDescriptor(t *testing.T) {
+func TestServiceDesc(t *testing.T) {
 	desc := GetTestServiceDesc()
 	if desc.ServiceName != "testdata.Test" {
 		t.Error("Service name does not match")
@@ -16,29 +20,42 @@ func TestServiceDescriptor(t *testing.T) {
 	if len(desc.Streams) != 3 {
 		t.Error("Expected 3 streams")
 	}
-	if expectedDescString != ListMethodsAndStreams(desc) {
-		t.Errorf("Expected desc string \n%s but was \n%s", expectedDescString, ListMethodsAndStreams(desc))
+	if desc.Methods[0].MethodName != "UnaryCall" {
+		t.Errorf("Expected UnaryCall method but was %s", desc.Methods[0].MethodName)
+	}
+	if desc.Streams[0].StreamName != "Downstream" {
+		t.Errorf("Expected Downstream stream but was %s", desc.Streams[0].StreamName)
+	}
+	if desc.Streams[1].StreamName != "Upstream" {
+		t.Errorf("Expected Upstream stream but was %s", desc.Streams[1].StreamName)
+	}
+	if desc.Streams[2].StreamName != "Bidi" {
+		t.Errorf("Expected Bidi stream but was %s", desc.Streams[2].StreamName)
 	}
 }
 
-const expectedDescString =
-`Methods:
-	testdata.Test/UnaryCall
-Streams:
-	testdata.Test/Downstream
-	testdata.Test/Upstream
-	testdata.Test/Bidi
-`
-
-func ListMethodsAndStreams(desc grpc.ServiceDesc) string {
-	s := ""
-	s += "Methods:\n"
-	for _, m := range desc.Methods {
-		s += "\t" + desc.ServiceName + "/" + m.MethodName + "\n"
+func TestServiceDescriptorExposed(t *testing.T) {
+	data, idx := GetTestServiceDescriptor()
+	if len(idx) != 1 || idx[0] != 0 {
+		t.Errorf("Expected idx to be [0], but was %v", idx)
 	}
-	s += "Streams:\n"
-	for _, st := range desc.Streams {
-		s += "\t" + desc.ServiceName + "/" + st.StreamName + "\n"
+	decompressor, err := gzip.NewReader(bytes.NewReader(data))
+	if err != nil {
+		t.Fatal(err)
 	}
-	return s
+	decompressed, err := ioutil.ReadAll(decompressor)
+	if err != nil {
+		t.Fatal(err)
+	}
+	desc := &descriptor.FileDescriptorProto{}
+	if err := proto.Unmarshal(decompressed, desc); err != nil {
+		t.Fatal(err)
+	}
+	if len(desc.Service) != 1 {
+		t.Errorf("Expected 1 service, but found %v", len(desc.Service))
+	}
+	svc := desc.Service[0]
+	if svc.GetName() != "Test" {
+		t.Errorf("Expected service name to be Test, but was %s", svc.GetName())
+	}
 }
