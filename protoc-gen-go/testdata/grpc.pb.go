@@ -221,7 +221,7 @@ type TestServer interface {
 }
 
 func RegisterTestServer(s *grpc.Server, srv TestServer) {
-	s.RegisterService(&_Test_serviceDesc, srv)
+	s.RegisterService(_Test_serviceDesc, srv)
 }
 
 func _Test_UnaryCall_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -319,8 +319,8 @@ func GetTestServiceDescriptor() ([]byte, []int) { return fileDescriptor0, []int{
 
 var _Test_serviceDesc = GetTestServiceDesc()
 
-func GetTestServiceDesc() grpc.ServiceDesc {
-	return grpc.ServiceDesc{
+func GetTestServiceDesc() *grpc.ServiceDesc {
+	return &grpc.ServiceDesc{
 		ServiceName: "testdata.Test",
 		HandlerType: (*TestServer)(nil),
 		Methods: []grpc.MethodDesc{

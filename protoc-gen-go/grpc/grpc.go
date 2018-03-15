@@ -211,7 +211,7 @@ func (g *grpc) generateService(file *generator.FileDescriptor, service *pb.Servi
 
 	// Server registration.
 	g.P("func Register", servName, "Server(s *", grpcPkg, ".Server, srv ", serverType, ") {")
-	g.P("s.RegisterService(&", serviceDescVar, `, srv)`)
+	g.P("s.RegisterService(", serviceDescVar, `, srv)`)
 	g.P("}")
 	g.P()
 
@@ -226,8 +226,8 @@ func (g *grpc) generateService(file *generator.FileDescriptor, service *pb.Servi
 	g.P("func Get", servName, "ServiceDescriptor() ([]byte, []int) { return ", file.VarName(), ", []int{", strconv.Itoa(index), "} }")
 	getServiceDescFn := "Get" + servName + "ServiceDesc()"
 	g.P("var ", serviceDescVar, " = ", getServiceDescFn)
-	g.P("func ", getServiceDescFn, " grpc.ServiceDesc {")
-	g.P("return ", grpcPkg, ".ServiceDesc {")
+	g.P("func ", getServiceDescFn, " *grpc.ServiceDesc {")
+	g.P("return &", grpcPkg, ".ServiceDesc {")
 	g.P("ServiceName: ", strconv.Quote(fullServName), ",")
 	g.P("HandlerType: (*", serverType, ")(nil),")
 	g.P("Methods: []", grpcPkg, ".MethodDesc{")
