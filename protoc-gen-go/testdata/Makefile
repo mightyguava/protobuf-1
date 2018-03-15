@@ -54,6 +54,7 @@ golden:
 nuke:	clean
 
 testbuild:	regenerate
+	go get google.golang.org/grpc
 	go test
 
 regenerate:
