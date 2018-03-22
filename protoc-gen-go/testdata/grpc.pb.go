@@ -221,7 +221,7 @@ type TestServer interface {
 }
 
 func RegisterTestServer(s *grpc.Server, srv TestServer) {
-	s.RegisterService(_Test_serviceDesc, srv)
+	s.RegisterService(&_Test_serviceDesc, srv)
 }
 
 func _Test_UnaryCall_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -317,38 +317,34 @@ func (x *testBidiServer) Recv() (*StreamMsg, error) {
 
 func GetTestServiceDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-var _Test_serviceDesc = GetTestServiceDesc()
-
-func GetTestServiceDesc() *grpc.ServiceDesc {
-	return &grpc.ServiceDesc{
-		ServiceName: "testdata.Test",
-		HandlerType: (*TestServer)(nil),
-		Methods: []grpc.MethodDesc{
-			{
-				MethodName: "UnaryCall",
-				Handler:    _Test_UnaryCall_Handler,
-			},
+var _Test_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "testdata.Test",
+	HandlerType: (*TestServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "UnaryCall",
+			Handler:    _Test_UnaryCall_Handler,
 		},
-		Streams: []grpc.StreamDesc{
-			{
-				StreamName:    "Downstream",
-				Handler:       _Test_Downstream_Handler,
-				ServerStreams: true,
-			},
-			{
-				StreamName:    "Upstream",
-				Handler:       _Test_Upstream_Handler,
-				ClientStreams: true,
-			},
-			{
-				StreamName:    "Bidi",
-				Handler:       _Test_Bidi_Handler,
-				ServerStreams: true,
-				ClientStreams: true,
-			},
+	},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Downstream",
+			Handler:       _Test_Downstream_Handler,
+			ServerStreams: true,
 		},
-		Metadata: "grpc.proto",
-	}
+		{
+			StreamName:    "Upstream",
+			Handler:       _Test_Upstream_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "Bidi",
+			Handler:       _Test_Bidi_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
+	Metadata: "grpc.proto",
 }
 
 func init() { proto.RegisterFile("grpc.proto", fileDescriptor0) }

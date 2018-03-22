@@ -9,31 +9,6 @@ import (
 	"io/ioutil"
 )
 
-func TestServiceDesc(t *testing.T) {
-	desc := GetTestServiceDesc()
-	if desc.ServiceName != "testdata.Test" {
-		t.Error("Service name does not match")
-	}
-	if len(desc.Methods) != 1 {
-		t.Error("Expected 1 method")
-	}
-	if len(desc.Streams) != 3 {
-		t.Error("Expected 3 streams")
-	}
-	if desc.Methods[0].MethodName != "UnaryCall" {
-		t.Errorf("Expected UnaryCall method but was %s", desc.Methods[0].MethodName)
-	}
-	if desc.Streams[0].StreamName != "Downstream" {
-		t.Errorf("Expected Downstream stream but was %s", desc.Streams[0].StreamName)
-	}
-	if desc.Streams[1].StreamName != "Upstream" {
-		t.Errorf("Expected Upstream stream but was %s", desc.Streams[1].StreamName)
-	}
-	if desc.Streams[2].StreamName != "Bidi" {
-		t.Errorf("Expected Bidi stream but was %s", desc.Streams[2].StreamName)
-	}
-}
-
 func TestServiceDescriptorExposed(t *testing.T) {
 	data, idx := GetTestServiceDescriptor()
 	if len(idx) != 1 || idx[0] != 0 {
